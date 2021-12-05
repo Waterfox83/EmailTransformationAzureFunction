@@ -1,0 +1,81 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+  $("select.country").change(function() {
+    var selectedCountry = $(this).children("option:selected").val();
+    var selectedLabel = $(this).children("option:selected").text();
+    var dataPoints = [];
+    var chart = new CanvasJS.Chart("chartContainer", {
+      title: {
+        text: selectedLabel
+      },
+      data: [{
+        type: "line",
+        dataPoints: dataPoints,
+      }]
+    });
+
+    if (selectedCountry != -1) {
+      $.getJSON("https://emailbodyprocessorfunctionapp.azurewebsites.net/api/httptriggerfunction?name=" + selectedCountry, function(data) {
+        $.each(data, function(key, value) {
+          year = new Date().getFullYear()
+          valuesArray = value[0].split("/");
+          month = valuesArray[0] - 1;
+          day = valuesArray[1];
+          //alert("month: " + month+" day: " + day + " year: "+ year)
+          temp_value = new Date(year, month, day)
+
+          dataPoints.push({
+            x: temp_value,
+            y: parseInt(value[1])
+          });
+        });
+        chart.render();
+      });
+
+    }
+  });
+});
+</script>
+
+</head>
+<body>
+<div class ="select">  
+<center>  
+<div style="margin-top:16px;color:dimgrey;font-size:29px;font-family: Verdana, Arial, Helvetica, sans-serif;text-decoration:none;">Riversand Report</div>
+<p></p>
+<form action="#" method ="post" >   
+    <select class="country"> 
+         <option value="-1"> Please select a key: </option>
+         <option value="1"> Total number of Supplier Users </option>  
+         <option value="2"> Total number of Internal users(w/o tech admins and Bus super users) </option>  
+         <option value="3"> Number of items by workflow type and statusOnboarding Completed </option>
+         <option value="4"> Riversand Initiated(Non-GDSN) </option>
+         <option value="5"> Riversand Initiated(GDSN Sync) </option>
+         <option value="6"> Take Action Initiated(GDSN Sync) </option>
+         <option value="7"> Migrated Items </option>
+         <option value="8"> Onboarding In Progress </option>
+         <option value="9"> Supplier enrichment </option>
+         <option value="10"> Merchant review and enrichment </option>
+         <option value="11"> Ecomm steps </option>
+         <option value="12"> Take Action Initiated(GDSN Sync) </option>
+         <option value="13"> Riversand initiated(GDSN Sync) </option>
+         <option value="14"> Onboarding Cancelled </option>
+         <option value="15"> Maintenance Completed </option>
+         <option value="16"> Updated by GDSN </option>
+         <option value="17"> Supplier Maintenance </option>
+         <option value="18"> Internal Maintenance </option>
+         <option value="19"> Items without GDSN Data </option>
+         <option value="0"> Items with GDSN Data </option>
+  </select>  
+</form>  
+</center>  
+</div>
+<p></p>
+<div id="chartContainer" style="height: 300px; width: 100%;"></div>
+</body>
+</html>
